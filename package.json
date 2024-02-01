@@ -1,0 +1,38 @@
+{
+  "name": "vue3-lib",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "@wangeditor/editor": "^5.1.23",
+    "@wangeditor/editor-for-vue": "^5.1.12",
+    "core-js": "^3.8.3",
+    "cssfilter": "^0.0.10",
+    "element-plus": "^2.5.3",
+    "is-url": "^1.2.4",
+    "vue": "^3.2.13",
+    "vue-router": "^4.0.3",
+    "xss": "^1.0.14",
+    "z-chat-field": "^1.0.1",
+    "z-ctxmenu": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/is-url": "^1.2.32",
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-router": "~5.0.0",
+    "@vue/cli-plugin-typescript": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "less": "^4.0.0",
+    "less-loader": "^8.0.0",
+    "typescript": "~4.5.5"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ]
+}

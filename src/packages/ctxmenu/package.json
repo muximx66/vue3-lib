@@ -1,0 +1,8 @@
+{
+  "name": "z-ctxmenu",
+  "version": "1.0.0",
+  "description": "右键菜单组件",
+  "main": "index.ts",
+  "author": "zxh",
+  "license": "MIT"
+}
