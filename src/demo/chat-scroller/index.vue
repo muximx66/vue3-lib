@@ -1,42 +1,40 @@
 <template>
   <div>
-    <Scroller
-      @reach-top="onReachTop"
-      @reach-bottom="onReachBottom"
-      :data="data"
-      style="height: 500px; border: 1px solid"
-    >
-      <template #default="{ data }">
-        <div style="padding: 20px 30px; border-bottom: 1px solid #eee">
-          {{ (data as Row).content }}
-        </div>
+    <Scroller ref="scroller" @reach-top="onReachTop" :data="data" style="height: 500px; border: 1px solid">
+      <template #default="scoped">
+        <Item v-bind="scoped" />
       </template>
     </Scroller>
   </div>
 </template>
 <script lang="tsx" setup>
-import { shallowRef, onMounted } from "vue";
+import { shallowRef, onMounted, nextTick } from "vue";
 import { getData as postData } from "./mock";
 import { Row } from "./type";
 import Scroller from "@/packages/chat-scroller/index.vue";
+import Item from './item.vue'
 
 const data = shallowRef<Row[]>([]);
 const getData = async (count?: number) => {
   return (await postData(count)).list;
 };
 
+const scroller = shallowRef<InstanceType<typeof Scroller>>();
+
 const onReachTop = async () => {
-  data.value.unshift(...(await getData(20)));
+  const newData = await getData(20);
+  data.value.unshift(...newData);
   data.value = [...data.value];
+  await nextTick();
+  scroller.value?.repairOffset(newData.map(v => v.id));
+
 };
-const onReachBottom = async () => {
-  const newData = [...data.value];
-  newData.push(...(await getData(20)));
-  data.value = newData;
-};
+
 
 onMounted(async () => {
   data.value = await getData(30);
+  await nextTick();
+  scroller.value?.scrollToBottom();
 });
 </script>
 <style scoped lang="less"></style>

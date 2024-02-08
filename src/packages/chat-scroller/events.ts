@@ -1,5 +1,5 @@
-import { type ShallowRef, onMounted, onBeforeUnmount } from "vue";
-import type { ShallowElem } from "./type";
+import { onMounted, onBeforeUnmount, } from "vue";
+import type { ShallowElem, } from "./type";
 
 /** 滚动结束 */
 let scrollEndTimer: any = null;

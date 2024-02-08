@@ -42,13 +42,10 @@ export const getTip = () => {
 };
 export const getImg = () => {
   const imgs = [
-    "https://img.yzcdn.cn/vant/cat.jpeg",
-    "https://img1.baidu.com/it/u=1828501987,902472408&fm=253&fmt=auto&app=120&f=JPEG?w=731&h=500",
-    "https://img0.baidu.com/it/u=930396857,1584419945&fm=253&fmt=auto&app=120&f=JPEG?w=760&h=301",
-    "https://img2.baidu.com/it/u=1814561676,2470063876&fm=253&fmt=auto&app=138&f=JPEG?w=750&h=500",
-    "https://img1.baidu.com/it/u=4014765096,45504095&fm=253&fmt=auto&app=120&f=JPEG?w=1280&h=800",
-    "https://img2.baidu.com/it/u=4029364322,3895356641&fm=253&fmt=auto&app=120&f=JPEG?w=800&h=1196",
-    "https://img1.baidu.com/it/u=1991562588,2707489176&fm=253&fmt=auto&app=138&f=JPEG?w=407&h=500",
+    require("./assets/1.png"),
+    require("./assets/2.png"),
+    require("./assets/3.png"),
+    require("./assets/4.png"),
   ];
   return {
     id: uuid(),

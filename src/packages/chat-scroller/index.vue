@@ -1,27 +1,19 @@
 <template>
   <div class="z_chat_scroller_view" ref="view" @scroll.passive="onScroll">
     <div class="z_chat_scroller_body" ref="body">
-      <Item
-        :auto-update-size="autoUpdateSize"
-        @update-size="onChildSizeChange($event, null, SLOTS.HEADER)"
-      >
+      <Item :auto-update-size="autoUpdateSize" @update-size="onChildSizeChange($event, null, SLOTS.HEADER)"
+        :on-view-update="(fn: AnyFn) => addUpdateEvent(SLOTS.HEADER, fn)">
         <slot name="header" />
       </Item>
-      <Item
-        v-for="item in data"
-        :key="item[uniqueKey]"
-        :data="item"
-        :auto-update-size="autoUpdateSize"
-        @update-size="onChildSizeChange($event, item, SLOTS.DEFAULT)"
-      >
+      <Item v-for="item in data" :key="item[uniqueKey]" :data="item" :auto-update-size="autoUpdateSize"
+        :on-view-update="(fn: AnyFn) => addUpdateEvent(item[uniqueKey], fn)"
+        @update-size="onChildSizeChange($event, item, SLOTS.DEFAULT)">
         <template #default="scoped">
           <slot v-bind="scoped" />
         </template>
       </Item>
-      <Item
-        :auto-update-size="autoUpdateSize"
-        @update-size="onChildSizeChange($event, null, SLOTS.FOOTER)"
-      >
+      <Item :auto-update-size="autoUpdateSize" @update-size="onChildSizeChange($event, null, SLOTS.FOOTER)"
+        :on-view-update="(fn: AnyFn) => addUpdateEvent(SLOTS.FOOTER, fn)">
         <slot name="footer" />
       </Item>
     </div>
@@ -32,10 +24,6 @@
 import {
   ref,
   shallowRef,
-  onMounted,
-  onUnmounted,
-  watch,
-  ShallowRef,
 } from "vue";
 import { SLOTS } from "./enum";
 import {
@@ -44,25 +32,29 @@ import {
   useReachTop,
   useViewUpdate,
 } from "./events";
-import type { ShallowElem, ChildElem } from "./type";
+import { useRepairOffset, useTriggerViewUpdateEvent, useScrollToBottom } from './helper'
+import type { ShallowElem, ChildElem, AnyFn } from "./type";
 import Item from "./Item.vue";
 
 type Props = {
   data: any[];
-  uniqueKey?: string | number;
+  uniqueKey?: string;
   autoUpdateSize?: boolean;
+  scrollEndTimeout?: number;
 };
-const props = withDefaults(defineProps<Props>(), {
-  uniqueKey: "id",
-  autoUpdateSize: true,
-});
-
 type Emits = {
   (e: "scroll", value: UIEvent): void;
   (e: "scrollEnd", value: UIEvent): void;
   (e: "reachBottom", value: UIEvent): void;
   (e: "reachTop", value: UIEvent): void;
 };
+
+const props = withDefaults(defineProps<Props>(), {
+  uniqueKey: "id",
+  autoUpdateSize: true,
+  scrollEndTimeout: 300,
+});
+
 const emit = defineEmits<Emits>();
 
 /** 视口实例 */
@@ -83,7 +75,9 @@ useViewUpdate(
 );
 
 /** 子元素集合 */
-const childElems = new Map<string, ChildElem>();
+const childElemMap = new Map<string, ChildElem>();
+/** 子元素数组 */
+let childElems: ChildElem[] = [];
 /** 设置子元素 */
 const setChildElem = (
   id: string,
@@ -92,12 +86,18 @@ const setChildElem = (
   data: any,
   type: SLOTS
 ) => {
-  childElems.set(id, {
+  const elem = {
     el,
     size: size || el.offsetHeight,
     data,
     type,
+  } as ChildElem;
+  childElemMap.set(id, elem);
+  const uniqueKey = props.uniqueKey;
+  childElems = props.data.map(v => {
+    return childElemMap.get(v[uniqueKey]) as ChildElem
   });
+  (window as any).ChildElemMap = childElemMap;
 };
 
 /** 子元素尺寸变化 */
@@ -110,13 +110,28 @@ const onChildSizeChange = (el: HTMLElement, data: any, type: SLOTS) => {
   setChildElem(unique, el, size, data, type);
 };
 
+
+/** 更新事件集合 */
+const updateEvents = new Map<string, AnyFn>()
+/** 添加更新事件 */
+const addUpdateEvent = (unique: string, fn: AnyFn) => {
+  updateEvents.set(unique, fn)
+}
+
 /** 滚动事件 */
-const onScroll = (e: UIEvent) => {
+const onScroll = async (e: UIEvent) => {
   const { scrollTop, scrollHeight, clientHeight } = e.target as HTMLElement;
+
   // 滚动
   emit("scroll", e);
   // 滚动结束
-  useScrollEnd(() => emit("scrollEnd", e), 500);
+  useScrollEnd(async () => {
+    emit("scrollEnd", e)
+    // 更新视口
+    if (view.value) {
+      useTriggerViewUpdateEvent(updateEvents, view.value, childElems, props.uniqueKey)
+    }
+  }, props.scrollEndTimeout);
   // 触底
   if (useReachBottom(scrollTop, clientHeight, scrollHeight)) {
     emit("reachBottom", e);
@@ -126,6 +141,28 @@ const onScroll = (e: UIEvent) => {
     emit("reachTop", e);
   }
 };
+
+
+/** 修复偏移 */
+const repairOffset = (uniques: string[]) => {
+  useRepairOffset(view.value as HTMLElement, uniques.reduce((offset, unique) => {
+    const elem = childElemMap.get(unique)
+    if (elem) {
+      offset += elem.size
+    }
+    return offset
+  }, 0));
+}
+
+/** 滚动到底部 */
+const scrollToBottom = () => {
+  useScrollToBottom(view.value as HTMLElement)
+}
+
+defineExpose({
+  repairOffset,
+  scrollToBottom
+})
 </script>
 
 <style scoped lang="less">

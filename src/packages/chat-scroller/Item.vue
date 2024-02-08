@@ -1,13 +1,15 @@
 <template>
   <div ref="itemRef">
-    <slot :updateSize="updateSize" :data="data"></slot>
+    <slot :update-size="updateSize" :data="data" :on-view-update="onViewUpdate"></slot>
   </div>
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import type { AddViewUpdateEvent } from './type'
 type Props = {
   data?: any;
   autoUpdateSize: boolean;
+  onViewUpdate: AddViewUpdateEvent
 };
 const props = defineProps<Props>();
 type Emits = {
