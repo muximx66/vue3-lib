@@ -7,11 +7,11 @@
       <span>底部最新：{{ behindUnread }}</span>
     </div>
     <!-- <Scroller ref="scroller" @reach-top="onReachTop" @unread-change="onUnreadChange" :data="data" -->
-    <Scroller ref="scroller" @unread-change="onUnreadChange" :data="data" style="height: 500px; border: 1px solid">
+    <ChatScroller ref="scroller" @unread-change="onUnreadChange" :data="data" style="height: 500px; border: 1px solid">
       <template #default="scoped">
         <Item v-bind="scoped" />
       </template>
-    </Scroller>
+    </ChatScroller>
     <el-button @click="sendMessage">发送消息</el-button>
   </div>
 </template>
@@ -19,10 +19,10 @@
 import { shallowRef, onMounted, nextTick } from "vue";
 import { getData as postData } from "./mock";
 import { Row } from "./type";
-import Scroller from "@/packages/chat-scroller/index.vue";
+import { ChatScroller } from "@/packages/chat-scroller/index";
 import Item from './item.vue'
 
-const scroller = shallowRef<InstanceType<typeof Scroller>>();
+const scroller = shallowRef<InstanceType<typeof ChatScroller>>();
 
 
 const data = shallowRef<Row[]>([]);
