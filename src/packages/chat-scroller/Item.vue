@@ -1,13 +1,16 @@
 <template>
-  <div ref="itemRef">
-    <slot :update-size="updateSize" :data="data" :on-view-update="onViewUpdate"></slot>
+  <div ref="itemRef" v-bind:[ATTRS.ITEM_UNIQUE]="unique">
+    <slot :update-size="updateSize" :data="data" :index="index" :on-view-update="onViewUpdate"></slot>
   </div>
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { ATTRS } from './enum'
 import type { AddViewUpdateEvent } from './type'
 type Props = {
+  index: string;
   data?: any;
+  unique: string;
   autoUpdateSize: boolean;
   onViewUpdate: AddViewUpdateEvent
 };

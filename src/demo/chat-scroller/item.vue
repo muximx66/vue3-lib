@@ -1,5 +1,6 @@
 <template>
   <div style="padding: 20px 30px; border-bottom: 1px solid #eee">
+    <div>index：{{ index }}</div>
     <span v-if="data.msgType === 'M'">{{ (data as Row).content }}</span>
     <div v-if="data.msgType === 'T'" style="color:#666;text-align: center;">—— {{ data.tip }} ——</div>
     <template v-if="data.msgType === 'I'">
@@ -14,6 +15,7 @@ import type { Row } from './type'
 import type { AddViewUpdateEvent } from '@/packages/chat-scroller/type'
 
 type Props = {
+  index: string;
   data: Row;
   onViewUpdate: AddViewUpdateEvent;
   updateSize: () => void;
@@ -26,7 +28,6 @@ props.onViewUpdate(() => {
   const img = new Image()
   img.src = imgUrl as string;
   img.onload = async (e: Event) => {
-    console.log(e)
     imgSrc.value = img.src
     await nextTick();
     props.updateSize()
