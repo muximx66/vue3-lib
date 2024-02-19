@@ -12,6 +12,14 @@
         <Item v-bind="scoped" />
       </template>
     </ChatScroller>
+    <div>
+      <el-row type="flex">
+        <el-col>
+          <input type="file" @change="onImgChange" />
+        </el-col>
+      </el-row>
+      <ChatField ref="field" />
+    </div>
     <el-button @click="sendMessage">发送消息</el-button>
   </div>
 </template>
@@ -20,6 +28,7 @@ import { shallowRef, onMounted, nextTick } from "vue";
 import { getData as postData } from "./mock";
 import { Row } from "./type";
 import { ChatScroller } from "@/packages/chat-scroller/index";
+import ChatField from '@/packages/chat-field/index'
 import Item from './item.vue'
 
 const scroller = shallowRef<InstanceType<typeof ChatScroller>>();
@@ -29,6 +38,12 @@ const data = shallowRef<Row[]>([]);
 const getData = async (count?: number) => {
   return (await postData(count)).list;
 };
+
+const field = shallowRef<InstanceType<typeof ChatField>>();
+const onImgChange = (e: any) => {
+  const file = e.target.files[0] as File;
+  field.value?.insertImg(file)
+}
 
 const frontUnread = shallowRef(0)
 const behindUnread = shallowRef(0)

@@ -24,13 +24,9 @@
 </template>
 
 <script setup lang="ts">
-import {
-  ref,
-  shallowRef,
-  watch,
-} from "vue";
-import { SLOTS, SCROLL_DIRECTION } from "./enum";
-import { Animation } from './animation'
+import { ref, shallowRef, watch } from "vue";
+import { SLOTS, SCROLL_DIRECTION, ATTRS } from "./enum";
+import { Animation } from "./animation";
 import {
   useScrollEnd,
   useReachBottom,
@@ -43,7 +39,7 @@ import {
   useScrollToBottom,
   useSmoothScrollToBottom,
   useTriggerViewUpdateEvent,
-} from './helper'
+} from "./helper";
 import type { ShallowElem, ChildElem, AnyFn } from "./type";
 import Item from "./scroller-item.vue";
 
@@ -58,7 +54,7 @@ type Emits = {
   (e: "scrollEnd", value: UIEvent): void;
   (e: "reachBottom", value: UIEvent): void;
   (e: "reachTop", value: UIEvent): void;
-  (e: 'unreadChange', front: number, behind: number): void;
+  (e: "unreadChange", front: number, behind: number): void;
 };
 
 const props = withDefaults(defineProps<Props>(), {
@@ -98,25 +94,25 @@ const setChildElem = (
 ) => {
   const elem = {
     el,
-    size: typeof size === 'number' ? size : (el?.offsetHeight || 0),
+    size: typeof size === "number" ? size : el?.offsetHeight || 0,
     data,
     type,
   } as ChildElem;
   childElemMap.set(unique, elem);
   const uniqueKey = props.uniqueKey;
-  childElems = props.data.map(v => {
-    return childElemMap.get(v[uniqueKey]) as ChildElem
+  childElems = props.data.map((v) => {
+    return childElemMap.get(v[uniqueKey]) as ChildElem;
   });
 };
 /** 同步childElemes */
 watch(props.data, (data) => {
-  const uniqueKey = props.uniqueKey
-  data.forEach(v => {
-    const unique = v[uniqueKey]
+  const uniqueKey = props.uniqueKey;
+  data.forEach((v) => {
+    const unique = v[uniqueKey];
     if (childElemMap.has(unique)) return;
-    setChildElem(unique, v, undefined, 0, SLOTS.DEFAULT)
-  })
-})
+    setChildElem(unique, v, undefined, 0, SLOTS.DEFAULT);
+  });
+});
 
 /** 子元素尺寸变化 */
 const onChildSizeChange = (el: HTMLElement, data: any, type: SLOTS) => {
@@ -125,94 +121,93 @@ const onChildSizeChange = (el: HTMLElement, data: any, type: SLOTS) => {
     ? type
     : data[props.uniqueKey];
 
-  // 修复触底偏移量
-  if (!view.value) return;
-  const { scrollTop, clientHeight, scrollHeight } = view.value
-  if (scrollHeight <= clientHeight) return;
-  const headerSize = childElemMap.get(SLOTS.HEADER)?.size || 0;
-  const footerSize = childElemMap.get(SLOTS.FOOTER)?.size || 0;
-  const isReachBottom = headerSize + footerSize + (childElems.reduce((pre, v) => {
-    return pre + (v?.size || 0)
-  }, 0) - scrollTop - clientHeight) <= 1;
-  if (isReachBottom) {
-    smoothScrollToBottom();
-  }
+  autoScrollToBottom();
 
   // 收集子元素
   setChildElem(unique, data, el, size, type);
-
 };
 
-
 /** 更新事件集合 */
-const updateEvents = new Map<string, AnyFn>()
+const updateEvents = new Map<string, AnyFn>();
 /** 添加更新事件 */
 const addUpdateEvent = async (unique: string, fn: AnyFn) => {
-  updateEvents.set(unique, fn)
-}
+  updateEvents.set(unique, fn);
+};
 
 /** 未读数据 */
 const unreadData: Set<any> = new Set();
 /** 添加未读数据 */
 const addUnread = (data: any[]) => {
-  data.forEach(v => unreadData.add(v))
-}
+  data.forEach((v) => unreadData.add(v));
+};
 /** 更新未读数据 */
 const updateUnread = () => {
   if (!unreadData.size) return;
-  const uniqueKey = props.uniqueKey
-  const [, startIndex, endIndex] = useViewRange(view.value as HTMLElement, childElems, uniqueKey, (el: ChildElem) => {
-    const row = el.data;
-    // 更新未读
-    unreadData.has(row) && unreadData.delete(row)
-  })
+  const uniqueKey = props.uniqueKey;
+  const [, startIndex, endIndex] = useViewRange(
+    view.value as HTMLElement,
+    childElems,
+    uniqueKey,
+    (el: ChildElem) => {
+      const row = el.data;
+      // 更新未读
+      unreadData.has(row) && unreadData.delete(row);
+    }
+  );
   const data = props.data;
   // true-behind false-front
-  const direction = startIndex > data.length - endIndex - 1
-  const lessData = direction ?
-    data.slice(endIndex + 1) : data.slice(0, startIndex)
+  const direction = startIndex > data.length - endIndex - 1;
+  const lessData = direction
+    ? data.slice(endIndex + 1)
+    : data.slice(0, startIndex);
   let count = 0;
   const unreadSize = unreadData.size;
-  const unreadUniques = new Set([...unreadData].map(v => v[uniqueKey]));
-  lessData.some(v => {
+  const unreadUniques = new Set([...unreadData].map((v) => v[uniqueKey]));
+  lessData.some((v) => {
     if (count === unreadSize) return true;
-    unreadUniques.has(v[uniqueKey]) && (count++);
-  })
+    unreadUniques.has(v[uniqueKey]) && count++;
+  });
   const frontUnread = direction ? unreadSize - count : count;
-  const behindUnread = unreadSize - frontUnread
-  emit('unreadChange', frontUnread, behindUnread)
-  return [frontUnread, behindUnread]
-}
+  const behindUnread = unreadSize - frontUnread;
+  emit("unreadChange", frontUnread, behindUnread);
+  return [frontUnread, behindUnread];
+};
 
 /** 滚动方向 */
-let direction: SCROLL_DIRECTION = SCROLL_DIRECTION.BEHIND
+let direction: SCROLL_DIRECTION = SCROLL_DIRECTION.BEHIND;
 /** 滚动偏移量 */
 let offset = 0;
 /** 滚动事件 */
 const onScroll = async (e: UIEvent) => {
   const { scrollTop, scrollHeight, clientHeight } = e.target as HTMLElement;
   // 设置滚动方向
-  direction = scrollTop > offset ? SCROLL_DIRECTION.BEHIND : SCROLL_DIRECTION.FRONT
+  direction =
+    scrollTop > offset ? SCROLL_DIRECTION.BEHIND : SCROLL_DIRECTION.FRONT;
   // 设置滚动偏移量
   offset = scrollTop;
   // 滚动
   emit("scroll", e);
   // 滚动结束
   useScrollEnd(async () => {
-    emit("scrollEnd", e)
+    emit("scrollEnd", e);
     if (view.value) {
-      const uniqueKey = props.uniqueKey
+      const uniqueKey = props.uniqueKey;
       // 获取视口元素
-      useViewRange(view.value as HTMLElement, childElems, props.uniqueKey, (el: ChildElem) => {
-        // 触发更新事件
-        useTriggerViewUpdateEvent(updateEvents, el, uniqueKey)
-        // 更新未读
-        updateUnread()
-      })
+      useViewRange(
+        view.value as HTMLElement,
+        childElems,
+        props.uniqueKey,
+        (el: ChildElem) => {
+          // 触发更新事件
+          useTriggerViewUpdateEvent(updateEvents, el, uniqueKey);
+          // 更新未读
+          updateUnread();
+        }
+      );
     }
   }, props.scrollEndTimeout);
   // 更新未读
-  updateUnread()
+  updateUnread();
   // 触底
   if (useReachBottom(scrollTop, clientHeight, scrollHeight)) {
     emit("reachBottom", e);
@@ -223,25 +218,32 @@ const onScroll = async (e: UIEvent) => {
   }
 };
 
-
 /** 修复偏移 */
-const repairOffset = (uniques: string[]) => {
-  useRepairOffset(view.value as HTMLElement, uniques.reduce((offset, unique) => {
-    const elem = childElemMap.get(unique)
-    if (elem) {
-      offset += elem.size
-    }
-    return offset
-  }, 0));
-}
+const repairOffset = (data: any[]) => {
+  const uniqueKey = props.uniqueKey;
+  const offset = data
+    .map((v) => v[uniqueKey])
+    .reduce((offset, unique) => {
+      const elem = childElemMap.get(unique);
+      if (elem) {
+        const el = () =>
+          elem.el ||
+          view.value?.querySelector(`[${ATTRS.ITEM_UNIQUE}="${elem.data}"]`) ||
+          undefined;
+        offset += elem.size || el()?.offsetHeight || 0;
+      }
+      return offset;
+    }, 0);
+  useRepairOffset(view.value as HTMLElement, offset);
+};
 
 /** 滚动到底部 */
 const scrollToBottom = () => {
   direction = SCROLL_DIRECTION.BEHIND;
   useScrollToBottom(view.value as HTMLElement, () => {
-    onScroll({ target: view.value } as any)
-  })
-}
+    onScroll({ target: view.value } as any);
+  });
+};
 
 /** 动画栈 */
 const animationTask: Animation[] = [];
@@ -249,17 +251,39 @@ const animationTask: Animation[] = [];
 const smoothScrollToBottom = () => {
   direction = SCROLL_DIRECTION.BEHIND;
   useSmoothScrollToBottom(view.value as HTMLElement, animationTask, () => {
-    onScroll({ target: view.value } as any)
-  })
-}
+    onScroll({ target: view.value } as any);
+  });
+};
+
+/** 自动判断是否滚动到末尾 */
+const autoScrollToBottom = () => {
+  // 修复触底偏移量
+  if (!view.value || direction === SCROLL_DIRECTION.FRONT) return;
+  const { scrollTop, clientHeight, scrollHeight } = view.value;
+  if (scrollHeight <= clientHeight) return;
+  const headerSize = childElemMap.get(SLOTS.HEADER)?.size || 0;
+  const footerSize = childElemMap.get(SLOTS.FOOTER)?.size || 0;
+  const offset =
+    headerSize +
+    footerSize +
+    (childElems.reduce((pre, v) => {
+      return pre + (v?.size || 0);
+    }, 0) -
+      scrollTop -
+      clientHeight)
+  const isReachBottom = offset > 0 && offset <= 1
+  if (isReachBottom) {
+    smoothScrollToBottom();
+  }
+};
 
 defineExpose({
   addUnread,
   updateUnread,
   repairOffset,
   scrollToBottom,
-  smoothScrollToBottom
-})
+  smoothScrollToBottom,
+});
 </script>
 
 <style scoped lang="less">
