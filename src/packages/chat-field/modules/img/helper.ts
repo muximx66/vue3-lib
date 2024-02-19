@@ -29,6 +29,7 @@ export const insertNode = (file: File | string, editor: IDomEditor) => {
     fileCopy = file;
     fileManager.set(id, file);
   }
+  console.log(genNode(id, URL.createObjectURL(fileCopy)))
   editor.insertNode(genNode(id, URL.createObjectURL(fileCopy)));
   editor.focus();
   editor.move(1);

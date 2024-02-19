@@ -40,20 +40,21 @@ export const getTip = () => {
     tip: tips[Math.floor(Math.random() * tips.length)],
   } as Row;
 };
-export const getImg = () => {
+export const getImg = (index?: number) => {
   const imgs = [
     require("./assets/1.png"),
     require("./assets/2.png"),
     require("./assets/3.png"),
     require("./assets/4.png"),
   ];
+  const randomIndex = Math.floor(Math.random() * imgs.length)
   return {
     id: uuid(),
     date: getDate(),
     nickname: getNickname(),
     msgType: "I",
     owner: getOwner(),
-    imgUrl: imgs[Math.floor(Math.random() * imgs.length)],
+    imgUrl: imgs[typeof index === 'number' ? index : randomIndex],
   } as Row;
 };
 export const getMsg = () => {

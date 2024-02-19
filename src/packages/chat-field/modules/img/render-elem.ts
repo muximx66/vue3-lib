@@ -24,7 +24,7 @@ function renderElem(elemNode: SlateElement): VNode {
 }
 
 const renderConf = {
-  type: 'image', // 和 elemNode.type 一致
+  type: ELEMENT_TYPE, // 和 elemNode.type 一致
   renderElem,
 }
 

@@ -41,7 +41,6 @@ export const uuid = () => {
 export const useTexts = (editor: IDomEditor) => {
   const imgEnum = require('./modules/img/enum')
   const fileEnum = require('./modules/file/enum')
-  console.log(imgEnum, fileEnum)
   const html = editor.getHtml();
   const div = document.createElement("div");
   div.innerHTML = html;
@@ -61,14 +60,14 @@ export const useTexts = (editor: IDomEditor) => {
       if (nodeType === 1) {
         // 元素节点
         const tagName = (el as any)?.localName || "";
-        const id = getElemAttribute(el as any, "id") || "";
-        if (tagName === "chatImg".toLowerCase()) {
+        const id = getElemAttribute(el as any, imgEnum.ATTRS.ID) || "";
+        if (tagName === imgEnum.ELEMENT_TYPE.toLowerCase()) {
           data.push({
             type: "img",
             id,
             file: fileManager.get(id) as File,
           });
-        } else if (tagName === "chatFile".toLowerCase()) {
+        } else if (tagName === fileEnum.ELEMENT_TYPE.toLowerCase()) {
           data.push({
             type: "file",
             id,

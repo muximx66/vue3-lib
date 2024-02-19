@@ -21,15 +21,15 @@ type Props = {
   breakMode?: BREAK_MODE;
   placeholder?: string;
   maxlength?: number;
-  minHeight?: number;
-  maxHeight?: number;
+  minHeight?: string;
+  maxHeight?: string;
 };
 const props = withDefaults(defineProps<Props>(), {
   breakMode: BREAK_MODE.ENTER,
   placeholder: "请输入",
   maxlength: 500,
-  minHeight: 300,
-  maxHeight: 400,
+  minHeight: '300px',
+  maxHeight: '400px',
 });
 
 type Emits = {
@@ -42,8 +42,6 @@ type Emits = {
 };
 const emit = defineEmits<Emits>();
 
-const minHeightStr = computed(() => props.minHeight + "px");
-const maxHeightStr = computed(() => props.maxHeight + "px");
 
 /** 显示艾特弹窗 */
 const showMentionModal = () => {
@@ -96,13 +94,9 @@ defineExpose({
   /** 获取发送文本 */
   getTexts,
   /** 插入图片 */
-  insertImg: (file: File) => {
-    insertImg(file, editor.value as IDomEditor);
-  },
+  insertImg: (file: File) => insertImg(file, editor.value as IDomEditor),
   /** 插入文件 */
-  insertFile: (file: File) => {
-    insertFile(file, editor.value as IDomEditor);
-  },
+  insertFile: (file: File) => insertFile(file, editor.value as IDomEditor),
 });
 </script>
 <style scoped lang="less">
@@ -122,13 +116,13 @@ defineExpose({
 
     // 滚动
     .w-e-scroll {
-      min-height: v-bind(minHeightStr);
-      max-height: v-bind(maxHeightStr);
+      min-height: v-bind(minHeight);
+      max-height: v-bind(maxHeight);
     }
 
     // 输入框
     [contenteditable="true"] {
-      min-height: v-bind(minHeightStr);
+      min-height: v-bind(minHeight);
       padding: 0.3rem;
     }
 

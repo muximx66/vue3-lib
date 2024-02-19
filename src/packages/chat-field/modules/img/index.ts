@@ -4,7 +4,7 @@ import { elemToHtmlConf } from './elem-to-html'
 import { parseHtmlConf } from './parse-elem-html'
 import withPlugin from './plugin'
 
-const image: Partial<IModuleConf> = {
+const module: Partial<IModuleConf> = {
   renderElems: [renderConf],
   elemsToHtml: [elemToHtmlConf],
   parseElemsHtml: [parseHtmlConf],
@@ -12,4 +12,4 @@ const image: Partial<IModuleConf> = {
   editorPlugin: withPlugin,
 }
 
-export default image
+export default module

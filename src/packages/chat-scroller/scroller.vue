@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch } from "vue";
+import { nextTick, ref, shallowRef, watch } from "vue";
 import { SLOTS, SCROLL_DIRECTION, ATTRS } from "./enum";
 import { Animation } from "./animation";
 import {
@@ -84,6 +84,18 @@ useViewUpdate(
 const childElemMap = new Map<string, ChildElem>();
 /** 子元素数组 */
 let childElems: ChildElem[] = [];
+/** 生成子元素 */
+const genChildElem = (
+  data: any,
+  el: HTMLElement | void,
+  size: number | void,
+  type: SLOTS) =>
+  ({
+    el,
+    size: typeof size === "number" ? size : el?.offsetHeight || 0,
+    data,
+    type,
+  }) as ChildElem;
 /** 设置子元素 */
 const setChildElem = (
   unique: string,
@@ -92,16 +104,11 @@ const setChildElem = (
   size: number | void,
   type: SLOTS
 ) => {
-  const elem = {
-    el,
-    size: typeof size === "number" ? size : el?.offsetHeight || 0,
-    data,
-    type,
-  } as ChildElem;
+  const elem = genChildElem(data, el, size, type)
   childElemMap.set(unique, elem);
   const uniqueKey = props.uniqueKey;
   childElems = props.data.map((v) => {
-    return childElemMap.get(v[uniqueKey]) as ChildElem;
+    return (childElemMap.get(v[uniqueKey]) || genChildElem(v, undefined, 0, SLOTS.DEFAULT)) as ChildElem;
   });
 };
 /** 同步childElemes */
@@ -121,7 +128,9 @@ const onChildSizeChange = (el: HTMLElement, data: any, type: SLOTS) => {
     ? type
     : data[props.uniqueKey];
 
-  autoScrollToBottom();
+  // 判断是否自动滚动至底部
+  const oldElem = childElemMap.get(unique)
+  autoScrollToBottom(size, (oldElem?.size || 0));
 
   // 收集子元素
   setChildElem(unique, data, el, size, type);
@@ -182,7 +191,7 @@ const onScroll = async (e: UIEvent) => {
   const { scrollTop, scrollHeight, clientHeight } = e.target as HTMLElement;
   // 设置滚动方向
   direction =
-    scrollTop > offset ? SCROLL_DIRECTION.BEHIND : SCROLL_DIRECTION.FRONT;
+    scrollTop >= offset ? SCROLL_DIRECTION.BEHIND : SCROLL_DIRECTION.FRONT;
   // 设置滚动偏移量
   offset = scrollTop;
   // 滚动
@@ -256,9 +265,9 @@ const smoothScrollToBottom = () => {
 };
 
 /** 自动判断是否滚动到末尾 */
-const autoScrollToBottom = () => {
+const autoScrollToBottom = (newSize: number, oldSize: number) => {
   // 修复触底偏移量
-  if (!view.value || direction === SCROLL_DIRECTION.FRONT) return;
+  if (!oldSize || newSize - oldSize <= 0 || !view.value) return;
   const { scrollTop, clientHeight, scrollHeight } = view.value;
   if (scrollHeight <= clientHeight) return;
   const headerSize = childElemMap.get(SLOTS.HEADER)?.size || 0;
@@ -270,8 +279,9 @@ const autoScrollToBottom = () => {
       return pre + (v?.size || 0);
     }, 0) -
       scrollTop -
-      clientHeight)
-  const isReachBottom = offset > 0 && offset <= 1
+      clientHeight);
+  const isReachBottom = offset >= 0 && offset <= 10;
+  console.log(offset)
   if (isReachBottom) {
     smoothScrollToBottom();
   }
