@@ -1,18 +1,17 @@
-import { ELEMENT_TYPE, ATTRS } from "./enum";
+import { ELEMENT_TYPE, ATTRS, SYMBOL_TYPE } from "./enum";
 import { ATTRS as COMMON_ATTRS } from "../../enum";
 import { getElemAttribute } from "../../helper";
-import type { ElementNode } from "./custom-types";
+import type { SymbolNode } from "./custom-types";
 
-function parseElemHtml(elem: any): ElementNode {
+function parseSymbolHtml(elem: any): SymbolNode {
   return {
-    type: ELEMENT_TYPE,
-    name: getElemAttribute(elem, ATTRS.NAME),
+    type: SYMBOL_TYPE,
     id: getElemAttribute(elem, ATTRS.ID),
     children: [{ text: "" }], // void node 有一个空白 text
   };
 }
 
-export const parseHtmlConf = {
-  selector: `span[${COMMON_ATTRS.TYPE}="${ELEMENT_TYPE}"]`, // data-w-e-type 属性，留给自定义元素，保证扩展性
-  parseElemHtml,
+export const parseSymbolHtmlConf = {
+  selector: `span[${COMMON_ATTRS.TYPE}="${SYMBOL_TYPE}"]`, // data-w-e-type 属性，留给自定义元素，保证扩展性
+  parseElemHtml: parseSymbolHtml,
 };

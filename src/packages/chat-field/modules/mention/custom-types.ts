@@ -1,12 +1,12 @@
-export type ElementType = "chatMention";
+export type SymbolType = "chatMentionSymbol";
 
 export type EmptyText = {
   text: "";
 };
-/** 图片元素抽象类型 */
-export type ElementNode = {
-  type: ElementType;
+
+/** 艾特符号元素抽象类型 */
+export type SymbolNode = {
+  type: SymbolType;
   id: string;
-  name: string;
   children: EmptyText[];
 };

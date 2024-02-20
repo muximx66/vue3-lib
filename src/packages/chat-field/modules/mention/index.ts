@@ -1,15 +1,13 @@
-import { IModuleConf } from '@wangeditor/editor'
-import { renderConf } from './render-elem'
-import { elemToHtmlConf } from './elem-to-html'
-import { parseHtmlConf } from './parse-elem-html'
-import withPlugin from './plugin'
+import { IModuleConf } from "@wangeditor/editor";
+import { renderSymbolConf } from "./render-elem";
+import { symbolToHtmlConf } from "./elem-to-html";
+import { parseSymbolHtmlConf } from "./parse-elem-html";
+import { withSymbolPlugin } from "./plugin";
 
-const image: Partial<IModuleConf> = {
-  renderElems: [renderConf],
-  elemsToHtml: [elemToHtmlConf],
-  parseElemsHtml: [parseHtmlConf],
+export const mentionSymbol: Partial<IModuleConf> = {
+  renderElems: [renderSymbolConf],
+  elemsToHtml: [symbolToHtmlConf],
+  parseElemsHtml: [parseSymbolHtmlConf],
   menus: [],
-  editorPlugin: withPlugin,
-}
-
-export default image
+  editorPlugin: withSymbolPlugin,
+};

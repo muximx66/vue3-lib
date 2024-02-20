@@ -1,33 +1,17 @@
-import { ELEMENT_TYPE, MENU_CONFIG } from "./enum";
+import { MENU_CONFIG, SYMBOL_TYPE } from "./enum";
 import { IDomEditor } from "@wangeditor/editor";
-import type { ElementNode } from "./custom-types";
+import type { SymbolNode } from "./custom-types";
 
-/** 生成抽象元素 */
-export const genNode = (id: string, name: string) => {
+export const genSymbolNode = (id: string) => {
   const resume = {
-    type: ELEMENT_TYPE,
+    type: SYMBOL_TYPE,
     id,
-    name,
-    children: [{ text: "" }],
-  } as ElementNode;
+  } as SymbolNode;
   return resume;
 };
-
 /** 插入元素 */
-export const insertNode = (id: string, name: string, editor: IDomEditor) => {
-  const range = window.getSelection()?.getRangeAt(0);
-  if (editor.selection === null) editor.restoreSelection();
-  if (!range) return;
-  const text = range.commonAncestorContainer.textContent || "";
-  const startOffset = range.startOffset;
-  const preText = text.slice(0, startOffset + 1);
-  const index = preText.lastIndexOf("@");
-  let deleteLength = startOffset - index;
-  while (deleteLength > 0) {
-    editor.deleteBackward("character");
-    deleteLength--;
-  }
-  editor.insertNode(genNode(id, name));
+export const insertSymbolNode = (id: string, editor: IDomEditor) => {
+  editor.insertNode(genSymbolNode(id));
 };
 
 /** 获取配置 */

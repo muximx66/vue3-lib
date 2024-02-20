@@ -1,32 +1,28 @@
 import { Element as SlateElement } from "slate";
 import { VNode, h } from "snabbdom";
-import { ELEMENT_TYPE, ATTRS } from "./enum";
+import { ATTRS, SYMBOL_TYPE } from "./enum";
 import { ATTRS as COMMON_ATTRS } from "../../enum";
-import type { ElementNode } from "./custom-types";
+import type { SymbolNode } from "./custom-types";
 
-function renderElem(elemNode: SlateElement): VNode {
-  const { id, name } = elemNode as ElementNode;
+function renderSymbol(elemNode: SlateElement): VNode {
+  console.log("render");
+  const { id } = elemNode as SymbolNode;
   const vNode = h(
     "span",
     {
       attrs: {
-        [COMMON_ATTRS.TYPE]: ELEMENT_TYPE,
+        [COMMON_ATTRS.TYPE]: SYMBOL_TYPE,
         [ATTRS.ID]: id,
-        [ATTRS.NAME]: name,
-      },
-      style: {
-        color: "#1890ff",
-        paddingRight: "4px",
       },
     },
-    `@${name}`
+    "@"
   );
   return vNode;
 }
 
-const renderConf = {
-  type: ELEMENT_TYPE, // 和 elemNode.type 一致
-  renderElem,
+const renderSymbolConf = {
+  type: SYMBOL_TYPE,
+  renderElem: renderSymbol,
 };
 
-export { renderConf };
+export { renderSymbolConf };
