@@ -1,4 +1,4 @@
-export type ElementType = "chatFile";
+export type ElementType = "chatMention";
 
 export type EmptyText = {
   text: "";
@@ -7,7 +7,6 @@ export type EmptyText = {
 export type ElementNode = {
   type: ElementType;
   id: string;
-  url: string;
   name: string;
   children: EmptyText[];
 };

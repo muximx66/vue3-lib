@@ -8,7 +8,6 @@ function parseElemHtml(elem: any): ElementNode {
     type: ELEMENT_TYPE,
     name: getElemAttribute(elem, ATTRS.NAME),
     id: getElemAttribute(elem, ATTRS.ID),
-    url: getElemAttribute(elem, ATTRS.URL),
     children: [{ text: "" }], // void node 有一个空白 text
   };
 }

@@ -1,19 +1,28 @@
 <template>
   <div class="editor_field">
-    <Editor ref="editorR" :style="{
-      overflow: ' hidden',
-    }" :defaultConfig="config.default" :mode="config.mode" @dragover="$emit('dragover', $event)" @onCreated="onCreated"
-      @customPaste="onPaste" @keydown.enter.prevent="onEnter" />
+    <Editor
+      ref="editorR"
+      :style="{
+        overflow: ' hidden',
+      }"
+      :defaultConfig="config.default"
+      :mode="config.mode"
+      @dragover="$emit('dragover', $event)"
+      @onCreated="onCreated"
+      @customPaste="onPaste"
+      @keydown.enter.prevent="onEnter"
+    />
   </div>
 </template>
 <script setup lang="ts">
-import { shallowRef, computed } from "vue";
+import { shallowRef, onBeforeUnmount } from "vue";
 import { Editor } from "@wangeditor/editor-for-vue";
 import { IDomEditor } from "@wangeditor/editor";
 import { useConfig } from "./editor";
 import { useTexts } from "./helper";
-import { insertNode as insertImg } from './modules/img/helper'
-import { insertNode as insertFile } from './modules/file/helper'
+import { fileManager } from "./file";
+import { insertNode as heplerInsertImg } from "./modules/img/helper";
+import { insertNode as heplerInsertFile } from "./modules/file/helper";
 import { onEnter as onEditorEnter, onPaste, BREAK_MODE } from "./events";
 import "@wangeditor/editor/dist/css/style.css";
 
@@ -28,8 +37,8 @@ const props = withDefaults(defineProps<Props>(), {
   breakMode: BREAK_MODE.ENTER,
   placeholder: "请输入",
   maxlength: 500,
-  minHeight: '300px',
-  maxHeight: '400px',
+  minHeight: "300px",
+  maxHeight: "400px",
 });
 
 type Emits = {
@@ -42,21 +51,20 @@ type Emits = {
 };
 const emit = defineEmits<Emits>();
 
-
 /** 显示艾特弹窗 */
 const showMentionModal = () => {
   const range = window.getSelection()?.getRangeAt(0);
   if (!range) return;
-  const rect = range.getBoundingClientRect()
+  const rect = range.getBoundingClientRect();
   emit("mentionShow", rect);
 };
 /** 隐藏艾特弹窗 */
 const hideMentionModal = () => {
-  emit('mentionHide')
+  emit("mentionHide");
 };
 const onMentionInput = (value: string) => {
   emit("mentionInput", value);
-}
+};
 /** 配置 */
 const config = useConfig(() => editor.value as IDomEditor, {
   placeholder: props.placeholder || "",
@@ -83,20 +91,47 @@ const onEnter = (e: KeyboardEvent) => {
   onEditorEnter(e, props.breakMode, editor.value as IDomEditor);
   emit("enter", e);
 };
-
 /** 获取发送消息 */
 const getTexts = () => {
   const texts = useTexts(editor.value as IDomEditor);
   return texts;
 };
+/** 插入文本 */
+const insertText = (text: string) => {
+  editor.value?.insertNode({
+    text,
+  });
+};
+/** 插入图片 */
+const insertImg = (file: File) => {
+  return heplerInsertImg(file, editor.value as IDomEditor);
+};
+/** 插入文本 */
+const insertFile = (file: File) => {
+  return heplerInsertFile(file, editor.value as IDomEditor);
+};
+/** 清空内容 */
+const clear = () => {
+  fileManager.clear();
+  editor.value?.clear();
+};
+
+/** 销毁清空数据 */
+onBeforeUnmount(() => {
+  fileManager.clear();
+});
 
 defineExpose({
+  /** 清空 */
+  clear,
   /** 获取发送文本 */
   getTexts,
+  /** 插入文本 */
+  insertText,
   /** 插入图片 */
-  insertImg: (file: File) => insertImg(file, editor.value as IDomEditor),
+  insertImg,
   /** 插入文件 */
-  insertFile: (file: File) => insertFile(file, editor.value as IDomEditor),
+  insertFile,
 });
 </script>
 <style scoped lang="less">

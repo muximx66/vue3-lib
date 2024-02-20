@@ -17,7 +17,7 @@
 </template>
 <script setup lang="tsx">
 import { ref } from "vue";
-import { CtxMenuPanel, TRIGGER_ATTR } from "@/packages/ctx-menu";
+import { CtxMenuPanel, TRIGGER_ATTR } from "@/packages/ctx-menu/index";
 
 const menuData = ref<Map<string, any>>(new Map());
 

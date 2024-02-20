@@ -1,9 +1,9 @@
-import { toAttr as enumToAttr } from './enum'
+import { toAttr as enumToAttr } from "./enum";
 import { fileManager } from "./file";
 import { type IDomEditor } from "@wangeditor/editor";
 
 /** 转化属性 */
-export const toAttr = enumToAttr
+export const toAttr = enumToAttr;
 
 /** 获取元素类型 */
 export const getElemAttribute = (el: any, attr: string) => {
@@ -36,11 +36,10 @@ export const uuid = () => {
   return uuid;
 };
 
-
 /** 获取文本列表 */
 export const useTexts = (editor: IDomEditor) => {
-  const imgEnum = require('./modules/img/enum')
-  const fileEnum = require('./modules/file/enum')
+  const imgEnum = require("./modules/img/enum");
+  const fileEnum = require("./modules/file/enum");
   const html = editor.getHtml();
   const div = document.createElement("div");
   div.innerHTML = html;
@@ -60,7 +59,7 @@ export const useTexts = (editor: IDomEditor) => {
       if (nodeType === 1) {
         // 元素节点
         const tagName = (el as any)?.localName || "";
-        const id = getElemAttribute(el as any, imgEnum.ATTRS.ID) || "";
+        const id = getElemAttribute(el as HTMLElement, imgEnum.ATTRS.ID);
         if (tagName === imgEnum.ELEMENT_TYPE.toLowerCase()) {
           data.push({
             type: "img",

@@ -5,7 +5,7 @@ import {
   type IDomEditor,
   type SlateElement,
   DomEditor,
-  SlateEditor
+  SlateEditor,
 } from "@wangeditor/editor";
 
 /** 属性前缀 */
@@ -268,22 +268,20 @@ export class ChatMention {
   }
 
   /** 插入 */
-  static insertNode(id:string,name:string,editor: IDomEditor) {
-    const range=window.getSelection()?.getRangeAt(0);
-    if(editor.selection===null)editor.restoreSelection();
-    if(!range)return;
-    const text=range.commonAncestorContainer.textContent||''
-    const startOffset=range.startOffset;
-    const preText=text.slice(0,startOffset+1)
-    const index = preText.lastIndexOf('@')
-    let deleteLength=startOffset-index
-    while(deleteLength>0){
-      editor.deleteBackward('character')
-      deleteLength--
+  static insertNode(id: string, name: string, editor: IDomEditor) {
+    const range = window.getSelection()?.getRangeAt(0);
+    if (editor.selection === null) editor.restoreSelection();
+    if (!range) return;
+    const text = range.commonAncestorContainer.textContent || "";
+    const startOffset = range.startOffset;
+    const preText = text.slice(0, startOffset + 1);
+    const index = preText.lastIndexOf("@");
+    let deleteLength = startOffset - index;
+    while (deleteLength > 0) {
+      editor.deleteBackward("character");
+      deleteLength--;
     }
-    editor.insertNode(
-      ChatMention.genNode(id, name)
-    );
+    editor.insertNode(ChatMention.genNode(id, name));
   }
 
   /** 获取配置 */
@@ -291,7 +289,7 @@ export class ChatMention {
     return editor.getConfig()?.EXTEND_CONF?.mentionConfig as {
       showModal: (editor: IDomEditor) => void;
       hideModal: (editor: IDomEditor) => void;
-      onInput: (value: string,editor: IDomEditor) => void;
+      onInput: (value: string, editor: IDomEditor) => void;
     };
   }
 
@@ -310,36 +308,41 @@ export class ChatMention {
       return isVoid(elem);
     };
     newEditor.onChange = () => {
-      const selection= newEditor.selection
-      console.log(selection?.anchor,selection?.focus)
+      const selection = newEditor.selection;
+      console.log(selection?.anchor, selection?.focus);
       const node = DomEditor.getSelectedNodeByType(newEditor, ChatMention.type);
       if (node) move(1);
-      if(newEditor.isFocused()&&selection&&selection.anchor.offset===selection.focus.offset){
+      if (
+        newEditor.isFocused() &&
+        selection &&
+        selection.anchor.offset === selection.focus.offset
+      ) {
         const [node] = SlateEditor.node(newEditor, newEditor.selection as any);
-        if(!(node as any).type&&(node as any).text){
-          const offset = newEditor.selection?.anchor.offset || 0
-          const text= (node as any).text||''
-          const frontText = text.slice(0,offset+1)
-          const behindText = text.slice(offset+1)
-          const hide=()=>{
+        if (!(node as any).type && (node as any).text) {
+          const offset = newEditor.selection?.anchor.offset || 0;
+          const text = (node as any).text || "";
+          const frontText = text.slice(0, offset + 1);
+          const behindText = text.slice(offset + 1);
+          const hide = () => {
             const { hideModal } = ChatMention.getConfig(newEditor) || {};
-            if(hideModal){
+            if (hideModal) {
               hideModal(newEditor);
             }
-          }
-          if(frontText.indexOf('@')>-1){
-            const { onInput,showModal } = ChatMention.getConfig(newEditor) || {};
-            if(showModal){
+          };
+          if (frontText.indexOf("@") > -1) {
+            const { onInput, showModal } =
+              ChatMention.getConfig(newEditor) || {};
+            if (showModal) {
               showModal(newEditor);
             }
-            if(onInput){
-              const index = frontText.lastIndexOf('@')
-              const value = frontText.slice(index+1)
-              onInput(value,newEditor);
+            if (onInput) {
+              const index = frontText.lastIndexOf("@");
+              const value = frontText.slice(index + 1);
+              onInput(value, newEditor);
             }
-          }else if(behindText.indexOf('@')>-1){
+          } else if (behindText.indexOf("@") > -1) {
             hide();
-          }else{
+          } else {
             hide();
           }
         }
@@ -355,7 +358,10 @@ export class ChatMention {
         insertText(text);
         return;
       }
-      const [node,path] = SlateEditor.node(newEditor, newEditor.selection as any);
+      const [node, path] = SlateEditor.node(
+        newEditor,
+        newEditor.selection as any
+      );
       if (text === "@") {
         const { showModal } = ChatMention.getConfig(newEditor) || {};
         if (showModal) {

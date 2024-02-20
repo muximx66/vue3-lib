@@ -1,10 +1,8 @@
-import { ELEMENT_TYPE } from './enum'
-import { IDomEditor } from '@wangeditor/editor'
-import { uuid } from '../../helper'
-import { fileManager } from '../../file'
-import type { ElementNode } from './custom-types'
-
-
+import { ELEMENT_TYPE } from "./enum";
+import { IDomEditor } from "@wangeditor/editor";
+import { uuid } from "../../helper";
+import { fileManager } from "../../file";
+import type { ElementNode } from "./custom-types";
 
 /** 生成抽象元素 */
 export const genNode = (id: string, url: string) => {
@@ -14,8 +12,8 @@ export const genNode = (id: string, url: string) => {
     url,
     children: [{ text: "" }],
   } as ElementNode;
-  return node
-}
+  return node;
+};
 
 /** 插入元素 */
 export const insertNode = (file: File | string, editor: IDomEditor) => {
@@ -29,8 +27,7 @@ export const insertNode = (file: File | string, editor: IDomEditor) => {
     fileCopy = file;
     fileManager.set(id, file);
   }
-  console.log(genNode(id, URL.createObjectURL(fileCopy)))
   editor.insertNode(genNode(id, URL.createObjectURL(fileCopy)));
   editor.focus();
   editor.move(1);
-}
+};

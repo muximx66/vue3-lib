@@ -1,6 +1,6 @@
-import { DomEditor } from '@wangeditor/editor'
-import { ELEMENT_TYPE, IS_INLINE, IS_VOID } from './enum'
-import type { IDomEditor } from '@wangeditor/core'
+import { DomEditor } from "@wangeditor/editor";
+import { ELEMENT_TYPE, IS_INLINE, IS_VOID } from "./enum";
+import type { IDomEditor } from "@wangeditor/core";
 
 function withPlugin<T extends IDomEditor>(editor: T): T {
   const { isInline, isVoid, move, onChange } = editor;
@@ -23,4 +23,4 @@ function withPlugin<T extends IDomEditor>(editor: T): T {
   return newEditor;
 }
 
-export default withPlugin
+export default withPlugin;
