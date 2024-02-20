@@ -32,10 +32,12 @@
           </el-button>
         </div>
       </div>
-      <ChatField ref="field" min-height="150px" max-height="150px" />
+      <ChatField ref="field" @mention-hide="mentionVisible = false" @mention-show="onMentionShow" min-height="150px"
+        max-height="150px" />
       <el-button @click="sendMessage" style="margin-right: 20px">发送消息</el-button>
       <el-button @click="sendImg">发送图片</el-button>
     </div>
+    <Mention v-if="mentionVisible" :rect="mentionRect" />
   </div>
 </template>
 <script lang="tsx" setup>
@@ -45,10 +47,16 @@ import { Row } from "./type";
 import { ChatScroller } from "@/packages/chat-scroller/index";
 import ChatField from "@/packages/chat-field/index";
 import Item from "./item.vue";
+import Mention from './mention.vue'
 
 const scroller = shallowRef<InstanceType<typeof ChatScroller>>();
 
-
+const mentionVisible = shallowRef(false)
+const mentionRect = shallowRef<DOMRect>();
+const onMentionShow = (rect: DOMRect) => {
+  mentionRect.value = rect;
+  mentionVisible.value = true;
+}
 
 const data = shallowRef<Row[]>([]);
 const getData = async (count?: number) => {

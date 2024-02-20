@@ -49,7 +49,6 @@ const showMentionModal = () => {
   const domRange = domSelection?.getRangeAt(0)
   if (domRange == null) return
   const selectionRect = domRange.getBoundingClientRect()
-  console.log(selectionRect)
   emit("mentionShow", selectionRect);
 };
 /** 隐藏艾特弹窗 */
