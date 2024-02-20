@@ -6,13 +6,8 @@
       <span>顶部最新:{{ frontUnread }}</span>
       <span>底部最新：{{ behindUnread }}</span>
     </div>
-    <ChatScroller
-      ref="scroller"
-      @reach-top="onReachTop"
-      @unread-change="onUnreadChange"
-      :data="data"
-      style="height: 500px; border: 1px solid"
-    >
+    <ChatScroller ref="scroller" @reach-top="onReachTop" @unread-change="onUnreadChange" :data="data"
+      style="height: 500px; border: 1px solid">
       <template #default="scoped">
         <Item v-bind="scoped" />
       </template>
@@ -32,20 +27,13 @@
           </el-button>
         </div>
         <div class="toolbar_item">
-          <el-button
-            type="primary"
-            size="small"
-            class="item_btn"
-            @click="getTexts"
-          >
+          <el-button type="primary" size="small" class="item_btn" @click="getTexts">
             获取文本
           </el-button>
         </div>
       </div>
       <ChatField ref="field" min-height="150px" max-height="150px" />
-      <el-button @click="sendMessage" style="margin-right: 20px"
-        >发送消息</el-button
-      >
+      <el-button @click="sendMessage" style="margin-right: 20px">发送消息</el-button>
       <el-button @click="sendImg">发送图片</el-button>
     </div>
   </div>
@@ -59,6 +47,8 @@ import ChatField from "@/packages/chat-field/index";
 import Item from "./item.vue";
 
 const scroller = shallowRef<InstanceType<typeof ChatScroller>>();
+
+
 
 const data = shallowRef<Row[]>([]);
 const getData = async (count?: number) => {

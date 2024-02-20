@@ -1885,6 +1885,11 @@
   resolved "https://registry.npmmirror.com/@wangeditor/list-module/-/list-module-1.0.5.tgz#3fc0b167acddf885536b45fa0c127f9c6adaea33"
   integrity sha512-uDuYTP6DVhcYf7mF1pTlmNn5jOb4QtcVhYwSSAkyg09zqxI1qBqsfUnveeDeDqIuptSJhkh81cyxi+MF8sEPOQ==
 
+"@wangeditor/plugin-mention@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/@wangeditor/plugin-mention/-/plugin-mention-1.0.0.tgz#7da9a2677de9d4de0293642d883ed39cab4048b6"
+  integrity sha512-txQEoHxzil78WoTGXn0ENONZ2sdEL8GI5qBxETn6TMEXQkqiUXA4Kc8bV8D8nZDniC00oFb80kDmOIpT/KUBGw==
+
 "@wangeditor/table-module@^1.1.4":
   version "1.1.4"
   resolved "https://registry.npmmirror.com/@wangeditor/table-module/-/table-module-1.1.4.tgz#757d4a5868b2b658041cd323854a4d707c8347e9"

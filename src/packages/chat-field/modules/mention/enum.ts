@@ -18,7 +18,3 @@ export const ATTRS = {
 export const SYMBOL_IS_INLINE = true;
 
 export const SYMBOL_IS_VOID = false;
-
-export const IS_INLINE = true;
-
-export const IS_VOID = true;

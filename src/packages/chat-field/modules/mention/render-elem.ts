@@ -4,20 +4,15 @@ import { ATTRS, SYMBOL_TYPE } from "./enum";
 import { ATTRS as COMMON_ATTRS } from "../../enum";
 import type { SymbolNode } from "./custom-types";
 
-function renderSymbol(elemNode: SlateElement): VNode {
-  console.log("render");
+function renderSymbol(elemNode: SlateElement, children: VNode[] | null): VNode {
   const { id } = elemNode as SymbolNode;
-  const vNode = h(
-    "span",
-    {
-      attrs: {
-        [COMMON_ATTRS.TYPE]: SYMBOL_TYPE,
-        [ATTRS.ID]: id,
-      },
-    },
-    "@"
-  );
-  return vNode;
+  const child: any = [h('span', '@')]
+  if (children) child.push(...children)
+  return h('span', {
+    attrs: {
+      [ATTRS.ID]: id
+    }
+  }, child)
 }
 
 const renderSymbolConf = {

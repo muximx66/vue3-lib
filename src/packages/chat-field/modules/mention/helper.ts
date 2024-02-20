@@ -3,11 +3,12 @@ import { IDomEditor } from "@wangeditor/editor";
 import type { SymbolNode } from "./custom-types";
 
 export const genSymbolNode = (id: string) => {
-  const resume = {
+  const node = {
     type: SYMBOL_TYPE,
     id,
+    children: [{ text: '' }]
   } as SymbolNode;
-  return resume;
+  return node;
 };
 /** 插入元素 */
 export const insertSymbolNode = (id: string, editor: IDomEditor) => {

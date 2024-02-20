@@ -1,10 +1,10 @@
-import { type IDomEditor } from "@wangeditor/editor";
+import { type IDomEditor, type IEditorConfig } from "@wangeditor/editor";
 import { onUploadImg } from "./events";
 // 注册模块
 import './modules/index'
 
 /** 配置 */
-export const useConfig = (editor: () => IDomEditor, config?: any) => {
+export const useConfig = (editor: () => IDomEditor, config?: Partial<IEditorConfig>) => {
   return {
     mode: "simple",
     default: {
@@ -17,8 +17,8 @@ export const useConfig = (editor: () => IDomEditor, config?: any) => {
             onUploadImg(file, editor());
           },
         },
-      },
-    },
+      }
+    } as Partial<IEditorConfig>,
   };
 };
 

@@ -103,7 +103,7 @@ export const randomWait = (duration: number) =>
 
 export const getHistory = async () => {
   await randomWait(500);
-  const data = [];
+  const data: any[] = [];
   for (let i = 0; i < 20; i++) {
     data.push(getRow());
   }
@@ -115,7 +115,7 @@ export const getHistory = async () => {
 
 export const getData = async () => {
   await randomWait(500);
-  const data = [];
+  const data: any[] = [];
   for (let i = 0; i < Math.floor(Math.random() * 20); i++) {
     data.push(getRow());
   }

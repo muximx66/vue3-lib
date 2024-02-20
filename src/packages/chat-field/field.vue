@@ -1,17 +1,9 @@
 <template>
   <div class="editor_field">
-    <Editor
-      ref="editorR"
-      :style="{
-        overflow: ' hidden',
-      }"
-      :defaultConfig="config.default"
-      :mode="config.mode"
-      @dragover="$emit('dragover', $event)"
-      @onCreated="onCreated"
-      @customPaste="onPaste"
-      @keydown.enter.prevent="onEnter"
-    />
+    <Editor ref="editorR" :style="{
+      overflow: ' hidden',
+    }" :defaultConfig="config.default" :mode="config.mode" @dragover="$emit('dragover', $event)" @onCreated="onCreated"
+      @customPaste="onPaste" @keydown.enter.prevent="onEnter" />
   </div>
 </template>
 <script setup lang="ts">
@@ -53,13 +45,16 @@ const emit = defineEmits<Emits>();
 
 /** 显示艾特弹窗 */
 const showMentionModal = () => {
-  const range = window.getSelection()?.getRangeAt(0);
-  if (!range) return;
-  const rect = range.getBoundingClientRect();
-  emit("mentionShow", rect);
+  const domSelection = document.getSelection()
+  const domRange = domSelection?.getRangeAt(0)
+  if (domRange == null) return
+  const selectionRect = domRange.getBoundingClientRect()
+  console.log(selectionRect)
+  emit("mentionShow", selectionRect);
 };
 /** 隐藏艾特弹窗 */
 const hideMentionModal = () => {
+  console.log(12312)
   emit("mentionHide");
 };
 const onMentionInput = (value: string) => {
@@ -71,9 +66,8 @@ const config = useConfig(() => editor.value as IDomEditor, {
   maxLength: props.maxlength,
   EXTEND_CONF: {
     mentionConfig: {
-      showModal: showMentionModal,
-      hideModal: hideMentionModal,
-      onInput: onMentionInput,
+      showModal: showMentionModal, // 必须
+      hideModal: hideMentionModal, // 必须
     },
   },
 });

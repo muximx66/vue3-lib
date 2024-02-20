@@ -10,4 +10,4 @@ export const mentionSymbol: Partial<IModuleConf> = {
   parseElemsHtml: [parseSymbolHtmlConf],
   menus: [],
   editorPlugin: withSymbolPlugin,
-};
+}

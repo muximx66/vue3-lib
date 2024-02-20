@@ -22,7 +22,7 @@ export const createEditor = (el: HTMLElement, opts?: Partial<Config>) => {
 /** 方法 */
 const withMethods = (editor: Editor) => {
   /** 插入节点 */
-  editor.insertNode = (data: NodeData) => {};
+  editor.insertNode = (data: NodeData) => { };
   /** 插入回车 */
   editor.insertBreak = () => {
     const curRange = editor.getRange();
@@ -38,7 +38,7 @@ const withMethods = (editor: Editor) => {
     const startElement = editor.getElement(startContainer);
     const endElement = editor.getElement(endContainer);
     if (!startElement || !endElement) return [];
-    const elements = [];
+    const elements: any[] = [];
     let element = startElement;
     while (element) {
       elements.push(element);
