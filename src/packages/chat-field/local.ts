@@ -139,33 +139,38 @@ export const useBeforeLocalData = <T>(
   size = 20,
 ) => {
   const [data, uniqueMap] = useLocalData(key) as LocalReturn<T>
-  // 直接获取后size个
-  if (!relativeUnique) {
-    return data.slice(Math.max(data.length - size));
-  }
-  // 根据相对id获取数据
-  let index = Number((uniqueMap.get(relativeUnique) || -1))
+  const getRelativeIndex = () => Number((uniqueMap.get(relativeUnique) || -1))
   // 设置
   if (newData) {
-    // 未查询到相对id
+    // 直接设置
+    if (!relativeUnique) {
+      return useLocalData(key, newData)
+    }
+    // 根据相对id获取数据
+    const index = getRelativeIndex();
+    // 未查询到相对id数据
     if (index < 0) {
-      // 未找到设置的位置
       console.warn('uncaugth (in useBeforeLocalData)：set before error')
       return []
     }
-    // 获取需要更新的数据
+    // 找到了，获取需要更新的数据
     newData = newData.slice(0, Math.max(newData.length - index, 0))
     if (newData.length) useLocalData(key, [...newData, ...data])
     return newData;
   }
   // 获取
-  // 未获取到
+  // 无相对id，直接获取后size个
+  if (!relativeUnique) {
+    return data.slice(Math.max(data.length - size));
+  }
+  // 有相对id，根据相对id获取数据
+  const index = getRelativeIndex();
+  // 未获取到，返回空
   if (index < 0) {
     return [];
   }
   // 获取相对index位置size个
   return data.slice(Math.max(index - size, 0), index)
-
 }
 
 /** 设置/获取 尾部数据 */
