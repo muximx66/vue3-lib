@@ -1,6 +1,6 @@
 import { ATTRS } from "./enum";
 import { Animation, EASING } from "./animation";
-import type { ChildElem, AnyFn } from "@/type";
+import type { ChildElem, AnyFn } from "./type";
 
 /** 滚动至 */
 export const useScrollTo = (view: HTMLElement, offset: number) => {
