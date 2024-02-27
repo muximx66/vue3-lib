@@ -1,22 +1,36 @@
 <template>
   <div class="z_chat_scroller_view" ref="view" @scroll.passive="onScroll">
     <div class="z_chat_scroller_body" ref="body">
-      <Item :auto-update-size="autoUpdateSize" :unique="SLOTS.HEADER" :index="SLOTS.HEADER"
+      <Item
+        :auto-update-size="autoUpdateSize"
+        :unique="SLOTS.HEADER"
+        :index="SLOTS.HEADER"
         @update-size="onChildSizeChange($event, null, SLOTS.HEADER)"
-        :on-view-update="(fn: AnyFn) => addUpdateEvent(SLOTS.HEADER, fn)">
+        :on-view-update="(fn: AnyFn) => addUpdateEvent(SLOTS.HEADER, fn)"
+      >
         <slot name="header" />
       </Item>
-      <Item v-for="(item, index) in data" :key="item[uniqueKey]" :unique="item[uniqueKey]" :data="item"
-        :index="String(index)" :auto-update-size="autoUpdateSize"
+      <Item
+        v-for="(item, index) in data"
+        :key="item[uniqueKey]"
+        :unique="item[uniqueKey]"
+        :data="item"
+        :index="String(index)"
+        :auto-update-size="autoUpdateSize"
         :on-view-update="(fn: AnyFn) => addUpdateEvent(item[uniqueKey], fn)"
-        @update-size="onChildSizeChange($event, item, SLOTS.DEFAULT)">
+        @update-size="onChildSizeChange($event, item, SLOTS.DEFAULT)"
+      >
         <template #default="scoped">
           <slot v-bind="scoped" />
         </template>
       </Item>
-      <Item :auto-update-size="autoUpdateSize" :unique="SLOTS.FOOTER" :index="SLOTS.FOOTER"
+      <Item
+        :auto-update-size="autoUpdateSize"
+        :unique="SLOTS.FOOTER"
+        :index="SLOTS.FOOTER"
         @update-size="onChildSizeChange($event, null, SLOTS.FOOTER)"
-        :on-view-update="(fn: AnyFn) => addUpdateEvent(SLOTS.FOOTER, fn)">
+        :on-view-update="(fn: AnyFn) => addUpdateEvent(SLOTS.FOOTER, fn)"
+      >
         <slot name="footer" />
       </Item>
     </div>
@@ -24,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, shallowRef, watch } from "vue";
+import { ref, shallowRef, watch } from "vue";
 import { SLOTS, SCROLL_DIRECTION, ATTRS } from "./enum";
 import { Animation } from "./animation";
 import {
@@ -41,7 +55,7 @@ import {
   useTriggerViewUpdateEvent,
 } from "./helper";
 import type { ShallowElem, ChildElem, AnyFn } from "./type";
-import Item from "./scroller-item.vue";
+import Item from "./ScrollerItem.vue";
 
 type Props = {
   data: any[];
@@ -89,13 +103,14 @@ const genChildElem = (
   data: any,
   el: HTMLElement | void,
   size: number | void,
-  type: SLOTS) =>
+  type: SLOTS
+) =>
   ({
     el,
     size: typeof size === "number" ? size : el?.offsetHeight || 0,
     data,
     type,
-  }) as ChildElem;
+  } as ChildElem);
 /** 设置子元素 */
 const setChildElem = (
   unique: string,
@@ -104,11 +119,12 @@ const setChildElem = (
   size: number | void,
   type: SLOTS
 ) => {
-  const elem = genChildElem(data, el, size, type)
+  const elem = genChildElem(data, el, size, type);
   childElemMap.set(unique, elem);
   const uniqueKey = props.uniqueKey;
   childElems = props.data.map((v) => {
-    return (childElemMap.get(v[uniqueKey]) || genChildElem(v, undefined, 0, SLOTS.DEFAULT)) as ChildElem;
+    return (childElemMap.get(v[uniqueKey]) ||
+      genChildElem(v, undefined, 0, SLOTS.DEFAULT)) as ChildElem;
   });
 };
 /** 同步childElemes */
@@ -129,8 +145,8 @@ const onChildSizeChange = (el: HTMLElement, data: any, type: SLOTS) => {
     : data[props.uniqueKey];
 
   // 判断是否自动滚动至底部
-  const oldElem = childElemMap.get(unique)
-  autoScrollToBottom(size, (oldElem?.size || 0));
+  const oldElem = childElemMap.get(unique);
+  autoScrollToBottom(size, oldElem?.size || 0);
 
   // 收集子元素
   setChildElem(unique, data, el, size, type);
@@ -144,10 +160,11 @@ const addUpdateEvent = async (unique: string, fn: AnyFn) => {
 };
 
 /** 未读数据 */
-const unreadData: Set<any> = new Set();
+const unreadData: Map<string, any> = new Map();
 /** 添加未读数据 */
 const addUnread = (data: any[]) => {
-  data.forEach((v) => unreadData.add(v));
+  const uniqueKey = props.uniqueKey;
+  data.forEach((v) => unreadData.set(v[uniqueKey], v));
 };
 /** 更新未读数据 */
 const updateUnread = () => {
@@ -159,8 +176,9 @@ const updateUnread = () => {
     uniqueKey,
     (el: ChildElem) => {
       const row = el.data;
+      const unique = row[uniqueKey];
       // 更新未读
-      unreadData.has(row) && unreadData.delete(row);
+      unreadData.has(unique) && unreadData.delete(unique);
     }
   );
   const data = props.data;
@@ -171,10 +189,9 @@ const updateUnread = () => {
     : data.slice(0, startIndex);
   let count = 0;
   const unreadSize = unreadData.size;
-  const unreadUniques = new Set([...unreadData].map((v) => v[uniqueKey]));
   lessData.some((v) => {
     if (count === unreadSize) return true;
-    unreadUniques.has(v[uniqueKey]) && count++;
+    unreadData.has(v[uniqueKey]) && count++;
   });
   const frontUnread = direction ? unreadSize - count : count;
   const behindUnread = unreadSize - frontUnread;
@@ -247,10 +264,11 @@ const repairOffset = (data: any[]) => {
 };
 
 /** 滚动到底部 */
-const scrollToBottom = () => {
+const scrollToBottom = (fn?: any) => {
   direction = SCROLL_DIRECTION.BEHIND;
   useScrollToBottom(view.value as HTMLElement, () => {
     onScroll({ target: view.value } as any);
+    fn?.();
   });
 };
 
@@ -281,7 +299,6 @@ const autoScrollToBottom = (newSize: number, oldSize: number) => {
       scrollTop -
       clientHeight);
   const isReachBottom = offset >= 0 && offset <= 10;
-  console.log(offset)
   if (isReachBottom) {
     smoothScrollToBottom();
   }
