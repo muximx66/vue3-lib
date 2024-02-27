@@ -51,6 +51,7 @@ import {
   useViewRange,
   useRepairOffset,
   useScrollToBottom,
+  useSmoothScrollByUnique,
   useSmoothScrollToBottom,
   useTriggerViewUpdateEvent,
 } from "./helper";
@@ -68,7 +69,7 @@ type Emits = {
   (e: "scrollEnd", value: UIEvent): void;
   (e: "reachBottom", value: UIEvent): void;
   (e: "reachTop", value: UIEvent): void;
-  (e: "unreadChange", front: number, behind: number): void;
+  (e: "unreadChange", front: number, behind: number, unread: any[]): void;
 };
 
 const props = withDefaults(defineProps<Props>(), {
@@ -166,9 +167,19 @@ const addUnread = (data: any[]) => {
   const uniqueKey = props.uniqueKey;
   data.forEach((v) => unreadData.set(v[uniqueKey], v));
 };
+/** 清空未读 */
+const clearUnread = () => {
+  unreadData.clear();
+  updateUnread();
+};
 /** 更新未读数据 */
 const updateUnread = () => {
-  if (!unreadData.size) return;
+  const update = (front: number, behind: number) => {
+    const unread = [...unreadData.values()];
+    emit("unreadChange", front, behind, unread);
+    return [front, behind, unread];
+  };
+  if (!unreadData.size) return update(0, 0);
   const uniqueKey = props.uniqueKey;
   const [, startIndex, endIndex] = useViewRange(
     view.value as HTMLElement,
@@ -195,8 +206,7 @@ const updateUnread = () => {
   });
   const frontUnread = direction ? unreadSize - count : count;
   const behindUnread = unreadSize - frontUnread;
-  emit("unreadChange", frontUnread, behindUnread);
-  return [frontUnread, behindUnread];
+  return update(frontUnread, behindUnread);
 };
 
 /** 滚动方向 */
@@ -281,6 +291,15 @@ const smoothScrollToBottom = () => {
     onScroll({ target: view.value } as any);
   });
 };
+/** 动画滚动至指定item */
+const smoothScrollByUnique = (unique: string) => {
+  useSmoothScrollByUnique(
+    unique,
+    view.value as HTMLElement,
+    animationTask,
+    childElemMap
+  );
+};
 
 /** 自动判断是否滚动到末尾 */
 const autoScrollToBottom = (newSize: number, oldSize: number) => {
@@ -306,9 +325,11 @@ const autoScrollToBottom = (newSize: number, oldSize: number) => {
 
 defineExpose({
   addUnread,
+  clearUnread,
   updateUnread,
   repairOffset,
   scrollToBottom,
+  smoothScrollByUnique,
   smoothScrollToBottom,
 });
 </script>
