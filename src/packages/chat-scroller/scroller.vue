@@ -56,7 +56,7 @@ import {
   useTriggerViewUpdateEvent,
 } from "./helper";
 import type { ShallowElem, ChildElem, AnyFn } from "./type";
-import Item from "./ScrollerItem.vue";
+import Item from "./scroller-item.vue";
 
 type Props = {
   data: any[];
